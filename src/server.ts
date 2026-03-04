@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import "dotenv/config";
 import { userRouter } from "./routes/userRoutes";
 import { globalErrorHandler } from "./modules/user/presentation/middlewares/ErrorHandler";
+import nutritionRouter from "./modules/nutrition/routes/nutritionRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/users", userRouter);
+app.use("/api/nutrition", nutritionRouter);
 
 app.use(globalErrorHandler);
 

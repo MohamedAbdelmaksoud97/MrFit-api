@@ -20,6 +20,8 @@ export class Protect {
     // 2. التأكد إن صاحب التوكن لسه موجود في الداتابيز
     const user = await this.userRepository.findById(payload.sub);
 
+    console.log(user);
+
     if (!user) {
       throw new AppError("The user belonging to this token no longer exists.", 401);
     }
