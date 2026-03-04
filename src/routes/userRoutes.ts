@@ -2,7 +2,10 @@ import { Router } from "express";
 import { RegisterUserController } from "../modules/user/controllers/RegisterUserController";
 import { RegisterUser } from "../modules/user/application/use-cases/RegisterUser";
 //import { MongooseUserRepository } from "../modules/user/infrastructure/repositories/IMongooseRepository";
-import { FakeUserRepository } from "../modules/user/infrastructure/repositories/fakeRepository";
+import {
+  FakeUserRepository,
+  sharedUserRepository,
+} from "../modules/user/infrastructure/repositories/fakeRepository";
 import { BcryptHasher } from "../modules/user/infrastructure/hashers/BcryptHasher";
 
 import { JwtTokenEmailVerificationService } from "../modules/user/infrastructure/services/JWTService";
@@ -30,7 +33,7 @@ const userRouter = Router();
 
 // 1. الأدوات التقنية (Infrastructure)
 //const userRepository = new MongooseUserRepository();
-const userRepository = new FakeUserRepository();
+const userRepository = sharedUserRepository;
 
 const hasher = new BcryptHasher();
 const tokenService = new JwtTokenEmailVerificationService();

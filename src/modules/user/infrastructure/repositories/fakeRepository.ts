@@ -34,3 +34,4 @@ export class FakeUserRepository implements IUserRepository {
     this.users = this.users.filter((u) => u.getId() !== id);
   }
 }
+export const sharedUserRepository = new FakeUserRepository();
