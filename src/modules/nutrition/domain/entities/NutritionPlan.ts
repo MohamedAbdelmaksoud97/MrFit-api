@@ -36,4 +36,15 @@ export class NutritionPlan {
     // Logic to compare average meal macros vs dailyTargetMacros
     return true;
   }
+  public toggleMeal(dayNumber: number, mealName: string): void {
+    const day = this.days.find((d) => d.dayNumber === dayNumber);
+    if (!day) throw new Error("Day not found in this plan");
+
+    const meal = day.meals.find((m) => m.name === mealName);
+    if (!meal) throw new Error("Meal not found in this day");
+
+    // Toggle logic
+    meal.isCompleted = !meal.isCompleted;
+    meal.completedAt = meal.isCompleted ? new Date() : undefined;
+  }
 }

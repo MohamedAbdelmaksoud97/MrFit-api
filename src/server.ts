@@ -3,6 +3,7 @@ import "dotenv/config";
 import { userRouter } from "./routes/userRoutes";
 import { globalErrorHandler } from "./modules/user/presentation/middlewares/ErrorHandler";
 import nutritionRouter from "./modules/nutrition/routes/nutritionRoutes";
+import { workoutRouter } from "./modules/workout/routes/workoutRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/users", userRouter);
 app.use("/api/nutrition", nutritionRouter);
+app.use("/api/workout", workoutRouter);
 
 app.use(globalErrorHandler);
 

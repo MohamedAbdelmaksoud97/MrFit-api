@@ -14,6 +14,8 @@ import { Protect } from "../../user/application/use-cases/Protect";
 import { JwtTokenEmailVerificationService } from "../../user/infrastructure/services/JWTService";
 import { GetActiveNutritionPlan } from "../controllers/GetActiveNutritionPlan";
 import { GetTheActivePlan } from "../application/use-cases/GetTheActivePlan";
+import { ToggleMealController } from "../controllers/ToggleMealController";
+import { ToggleMealStatus } from "../application/use-cases/ToggleMealStatus";
 
 const router = Router();
 
@@ -30,9 +32,12 @@ const protectController = new ProtectController(protectUseCase);
 const generatePlanUseCase = new GenerateNutritionPlan(fakeAi, fakeRepo, userRepo);
 
 // 3. Initialize Controller
-const nutritionController = new NutritionController(generatePlanUseCase);
+const nutritionController = new NutritionController(generatePlanUseCase, fakeRepo);
 const getTheActivePlan = new GetTheActivePlan(fakeRepo, userRepo);
 const getActivePlanController = new GetActiveNutritionPlan(getTheActivePlan);
+
+const toggleMealUseCase = new ToggleMealStatus(fakeRepo);
+const toggleMealController = new ToggleMealController(toggleMealUseCase);
 
 // 4. Define Routes
 router.post(
@@ -45,6 +50,12 @@ router.get(
   "/active",
   (req, res, next) => protectController.execute(req, res, next),
   (req, res, next) => getActivePlanController.execute(req, res, next),
+);
+
+router.patch(
+  "/toggle-meal",
+  (req, res, next) => protectController.execute(req, res, next),
+  (req, res, next) => toggleMealController.execute(req, res, next),
 );
 
 export default router;

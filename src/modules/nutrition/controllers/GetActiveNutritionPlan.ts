@@ -11,7 +11,11 @@ export class GetActiveNutritionPlan {
 
     const plan = await this.getTheActivePlanUseCase.execute(userId);
     if (!plan) {
-      throw new AppError("Failed to retrieve active nutrition plan, please try again.");
+      res.status(404).json({
+        status: "fail",
+        message: "No active nutrition plan found for this user.",
+      });
+      return;
     }
 
     res.status(200).json({

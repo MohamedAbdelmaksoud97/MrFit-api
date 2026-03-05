@@ -3,14 +3,20 @@ import { Request, Response } from "express";
 import { GenerateNutritionPlan } from "../application/use-cases/GenerateNutritionPlan";
 import { catchAsync } from "../../../shared/domain/errors/CatchAsync";
 import { AppError } from "../../../shared/domain/errors/AppError";
+import { INutritionRepository } from "../domain/interfaces/INutritionRepository";
 
 export class NutritionController {
-  constructor(private generatePlanUseCase: GenerateNutritionPlan) {}
+  constructor(
+    private generatePlanUseCase: GenerateNutritionPlan,
+    private nutritionRepository: INutritionRepository,
+  ) {}
 
   // POST /api/v1/nutrition/generate
   generate = catchAsync(async (req: Request, res: Response) => {
     // Assuming 'req.user' is populated by your Auth middleware
     const userId = (req as any).user.id;
+
+    await this.nutritionRepository.archiveAllActivePlans(userId);
 
     const plan = await this.generatePlanUseCase.execute(userId);
 
