@@ -3,6 +3,7 @@ import { Router } from "express";
 import { NutritionController } from "../controllers/NutritionController";
 import { GenerateNutritionPlan } from "../application/use-cases/GenerateNutritionPlan";
 import { FakeAiGenerator } from "../infrastructure/services/FakeAiGenerator";
+import { GeminiNutritionGenerator } from "../infrastructure/services/GeminaiNutritionGenerator";
 import { FakeNutritionRepository } from "../infrastructure/services/FakeNutritionRepository";
 // Assume you have these from your User module
 import {
@@ -21,6 +22,7 @@ const router = Router();
 
 // 1. Initialize Dependencies (Fakes)
 const fakeAi = new FakeAiGenerator();
+const geminiAi = new GeminiNutritionGenerator(process.env.GEMINI_API_KEY || "");
 const fakeRepo = new FakeNutritionRepository();
 const userRepo = sharedUserRepository; // Real or Fake
 
@@ -29,7 +31,7 @@ const protectUseCase = new Protect(tokenService, userRepo);
 const protectController = new ProtectController(protectUseCase);
 
 // 2. Initialize Use Case
-const generatePlanUseCase = new GenerateNutritionPlan(fakeAi, fakeRepo, userRepo);
+const generatePlanUseCase = new GenerateNutritionPlan(geminiAi, fakeRepo, userRepo);
 
 // 3. Initialize Controller
 const nutritionController = new NutritionController(generatePlanUseCase, fakeRepo);

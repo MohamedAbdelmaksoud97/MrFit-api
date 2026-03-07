@@ -2,6 +2,7 @@ import { Router } from "express";
 import { WorkoutController } from "../controllers/workoutController";
 import { GenerateWorkoutPlan } from "../../workout/application/use-cases/GenerateWorkoutPlan";
 import { FakeWorkoutAiGenerator } from "../infrastructures/services/FakeWorkoutAiGenerator";
+import { GeminiWorkoutGenerator } from "../infrastructures/services/GeminaiWorkoutGenerator";
 
 import { GetActiveWorkoutPlan } from "../application/use-cases/GetActiveWorkoutPlan";
 
@@ -22,8 +23,9 @@ const protectController = new ProtectController(protectUseCase);
 
 const workoutAi = new FakeWorkoutAiGenerator();
 const workoutRepo = new FakeWorkoutRepository();
+const geminiWorkoutAi = new GeminiWorkoutGenerator(process.env.GEMINI_API_KEY || "");
 
-const generateWorkout = new GenerateWorkoutPlan(workoutRepo, sharedUserRepository, workoutAi);
+const generateWorkout = new GenerateWorkoutPlan(workoutRepo, sharedUserRepository, geminiWorkoutAi);
 const getActiveWorkoutUseCase = new GetActiveWorkoutPlan(workoutRepo);
 const getActiveWorkoutController = new GetActiveWorkoutController(getActiveWorkoutUseCase);
 

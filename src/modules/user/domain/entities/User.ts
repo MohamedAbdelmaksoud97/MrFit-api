@@ -4,6 +4,8 @@ export class UserProfile {
   constructor(
     public readonly age: number,
     public readonly height: number,
+    public readonly gender: "Male" | "Female",
+    public readonly fitnessLevel: "Beginner" | "Intermediate" | "Advanced",
     public readonly weight: number,
     public readonly goal: "Losing Weight" | "Building Muscle" | "Maintenance",
     public readonly fatPercentage?: number,

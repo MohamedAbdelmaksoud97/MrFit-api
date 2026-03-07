@@ -1,0 +1,74 @@
+// src/modules/workout/infrastructure/services/GeminiWorkoutGenerator.ts
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { IWorkoutAiGenerator } from "../../domain/interfaces/IWorkoutAiGenerator";
+import { User } from "../../../user/domain/entities/User";
+import { AppError } from "../../../../shared/domain/errors/AppError";
+
+export class GeminiWorkoutGenerator implements IWorkoutAiGenerator {
+  private genAI: GoogleGenerativeAI;
+
+  constructor(apiKey: string) {
+    this.genAI = new GoogleGenerativeAI(apiKey);
+  }
+
+  async generatePlan(user: User): Promise<any> {
+    try {
+      // استخدام نفس الموديل اللي نجح معاك
+      const model = this.genAI.getGenerativeModel({
+        model: "gemini-3-flash-preview",
+      });
+
+      const userProfile = user.getProfile();
+
+      const prompt = `
+        Act as a world-class Strength and Conditioning Coach. 
+        Generate a highly personalized 7-day workout split for:
+        - Goal: ${userProfile.goal}
+        - Fitness Level: ${userProfile.fitnessLevel} (Very Important: Adjust volume and intensity accordingly)
+        - Gender: ${userProfile.gender}
+
+        REQUIREMENTS:
+        1. Choose an appropriate split (e.g., PPL, Full Body, Upper/Lower) based on their level.
+        2. Include rest days.
+        3. For each exercise, provide specific sets, reps (or "To Failure"), and rest time.
+        4. Provide expert cues in "notes".
+
+        IMPORTANT: Return ONLY a raw JSON object. No markdown, no backticks, no preamble.
+        STRUCTURE:
+        {
+          "splitType": "string (e.g., Push Pull Legs)",
+          "days": [
+            {
+              "dayNumber": number,
+              "dayName": "string",
+              "isRestDay": boolean,
+              "workoutTitle": "string (e.g., Chest and Triceps)",
+              "exercises": [
+                {
+                  "name": "string",
+                  "muscleGroup": "string",
+                  "sets": number,
+                  "reps": "string",
+                  "restSeconds": number,
+                  "notes": "string"
+                }
+              ]
+            }
+          ]
+        }
+      `;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // تنظيف النص لضمان إنه JSON صالح
+      const cleanJson = text.replace(/```json|```/g, "").trim();
+
+      return JSON.parse(cleanJson);
+    } catch (error: any) {
+      console.error("DEBUG - GEMINI WORKOUT ERROR:", error);
+      throw new AppError(`Workout AI Error: ${error.message || "Model connection failed"}`, 500);
+    }
+  }
+}
