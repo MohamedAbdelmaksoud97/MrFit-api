@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
+    _id: { type: String, required: true },
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
@@ -18,7 +19,10 @@ const UserSchema = new mongoose.Schema(
       budgetLevel: { type: String, enum: ["Economic", "Average", "High"] },
     },
   },
-  { timestamps: true },
+  {
+    _id: false,
+    timestamps: true,
+  },
 );
 
 export const UserModel = mongoose.model("User", UserSchema);

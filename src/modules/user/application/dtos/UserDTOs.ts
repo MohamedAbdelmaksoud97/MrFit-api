@@ -6,6 +6,8 @@ export interface RegisteringUser {
     age: number;
     height: number;
     weight: number;
+    gender: "Male" | "Female";
+    fitnessLevel: "Beginner" | "Intermediate" | "Advanced";
     goal: "Losing Weight" | "Building Muscle" | "Maintenance";
     budgetLevel: "Economic" | "Average" | "High";
   };

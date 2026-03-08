@@ -6,6 +6,7 @@ import {
   FakeUserRepository,
   sharedUserRepository,
 } from "../modules/user/infrastructure/repositories/fakeRepository";
+import { MongoUserRepository } from "../modules/user/infrastructure/repositories/IMongooseRepository";
 import { BcryptHasher } from "../modules/user/infrastructure/hashers/BcryptHasher";
 
 import { JwtTokenEmailVerificationService } from "../modules/user/infrastructure/services/JWTService";
@@ -33,7 +34,7 @@ const userRouter = Router();
 
 // 1. الأدوات التقنية (Infrastructure)
 //const userRepository = new MongooseUserRepository();
-const userRepository = sharedUserRepository;
+const userRepository = new MongoUserRepository();
 
 const hasher = new BcryptHasher();
 const tokenService = new JwtTokenEmailVerificationService();

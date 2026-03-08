@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 
 const NutritionPlanSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    _id: { type: String, required: true, unique: true },
+    userId: { type: String, ref: "User", required: true },
     goalSnapshot: String,
     status: { type: String, enum: ["active", "archived"], default: "active" },
     dailyTargetMacros: { calories: Number, protein: Number, carbs: Number, fats: Number },

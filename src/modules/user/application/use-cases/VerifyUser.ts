@@ -11,6 +11,8 @@ export class VerifyUser {
   async execute(token: string): Promise<void> {
     const payload = (await this.tokenService.verifyToken(token)) as TokenPayload | null;
 
+    console.log("Decoded Token Payload:", payload); // Debugging log
+
     if (!payload || !payload.sub) {
       throw new AppError("Invalid or expired activation link.", 401);
     }

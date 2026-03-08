@@ -1,53 +1,41 @@
+// src/modules/user/infrastructure/repositories/MongoUserRepository.ts
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
-import { User as UserEntity, UserProfile } from "../../domain/entities/User";
-import { UserModel } from "../persistence/UserSchema"; // موديل المونجوس بتاعك
+import { User, UserProfile } from "../../domain/entities/User";
+import { UserModel } from "../models/UserModel";
 
-export class MongooseUserRepository implements IUserRepository {
-  // 1. تحويل من Domain Entity إلى Database Document (Mapping)
-  async save(user: UserEntity): Promise<void> {
-    const userProfile = user.getProfile();
-
-    const userData = {
+export class MongoUserRepository implements IUserRepository {
+  async save(user: User): Promise<void> {
+    const persistenceData = {
       username: user.getName(),
+      _id: user.getId(),
       email: user.getEmail(),
-      password: user.getPassword(),
-      profile: {
-        age: userProfile.age,
-        height: userProfile.height,
-        weight: userProfile.weight,
-        goal: userProfile.goal,
-        fatPercentage: userProfile.fatPercentage,
-        budgetLevel: userProfile.budgetLevel,
-      },
+      passwordHash: user.getPassword(),
+      isVerified: user.getVerificationStatus(),
+      profile: user.getProfile(),
     };
 
-    //findOneAndUpdate بتعمل Save لو جديد وتعمل Update لو موجود (Upsert)
-    await UserModel.findOneAndUpdate({ email: user.getEmail() }, userData, {
-      upsert: true,
-      new: true,
-    });
+    // Use findOneAndUpdate with upsert to handle both Create and Update
+    await UserModel.findOneAndUpdate(
+      { email: user.getEmail() },
+      { $set: persistenceData },
+      { upsert: true, new: true },
+    );
   }
 
-  // 2. تحويل من Database Document إلى Domain Entity (Mapping)
-  async findByEmail(email: string): Promise<UserEntity | null> {
-    const userDoc = await UserModel.findOne({ email }).select("+password");
-    if (!userDoc) return null;
+  async findByEmail(email: string): Promise<User | null> {
+    const doc = await UserModel.findOne({ email }).lean();
+    if (!doc) return null;
 
-    // بنرجع كائن الـ Entity "نظيف" لطبقة الـ Domain
-    return new UserEntity(
-      userDoc.username,
-      userDoc.email,
-      userDoc.password,
-      new UserProfile(
-        userDoc.profile?.age ?? 0,
-        userDoc.profile?.height ?? 0,
-        userDoc.profile?.weight ?? 0,
-        userDoc.profile?.goal || "Maintenance",
-        userDoc.profile?.fatPercentage ?? 0,
-        userDoc.profile?.budgetLevel || "Average",
-      ),
-      userDoc._id.toString(),
-    );
+    return this.mapToEntity(doc);
+  }
+
+  async findById(id: string): Promise<User | null> {
+    console.log("Fetching user by ID:", id);
+    const doc = await UserModel.findOne({ _id: id }).lean();
+
+    if (!doc) return null;
+
+    return this.mapToEntity(doc);
   }
 
   async exists(email: string): Promise<boolean> {
@@ -55,14 +43,35 @@ export class MongooseUserRepository implements IUserRepository {
     return count > 0;
   }
 
-  async findById(id: string): Promise<UserEntity | null> {
-    const userDoc = await UserModel.findById(id);
-    if (!userDoc) return null;
-    // ... نفس التحويل اللي فوق لـ Entity
-    return null; // (للاختصار)
-  }
-
   async delete(id: string): Promise<void> {
     await UserModel.findByIdAndDelete(id);
+  }
+
+  /**
+   * Helper method to map the Mongoose Document to the Domain Entity.
+   * This isolates the Database details from the User Entity.
+   */
+  private mapToEntity(doc: any): User {
+    const profile = new UserProfile(
+      doc.profile.age,
+      doc.profile.height,
+      doc.profile.gender,
+      doc.profile.fitnessLevel,
+      doc.profile.weight,
+      doc.profile.goal,
+      doc.profile.fatPercentage,
+      doc.profile.budgetLevel,
+    );
+
+    const user = new User(
+      doc.username,
+      doc.email,
+      doc.passwordHash,
+      profile,
+      doc._id.toString(), // Convert MongoDB ObjectId to string for our Entity
+    );
+
+    user.setVerified(doc.isVerified);
+    return user;
   }
 }

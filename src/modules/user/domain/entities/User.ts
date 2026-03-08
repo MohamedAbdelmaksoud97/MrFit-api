@@ -70,6 +70,8 @@ export class User {
     this.profile = new UserProfile(
       this.profile.age,
       this.profile.height,
+      this.profile.gender,
+      this.profile.fitnessLevel,
       newWeight,
       this.profile.goal,
       newFat,

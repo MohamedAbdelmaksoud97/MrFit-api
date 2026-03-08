@@ -11,7 +11,10 @@ export class RequestObjectToEntityConverter {
     const userProfile = new UserProfile(
       dto.profile.age,
       dto.profile.height,
+      dto.profile.gender,
+      dto.profile.fitnessLevel,
       dto.profile.weight,
+
       dto.profile.goal,
       undefined, // fatPercentage (لو لسه معندناش قيمته في التسجيل)
       dto.profile.budgetLevel,
@@ -19,7 +22,9 @@ export class RequestObjectToEntityConverter {
 
     // 2. بنرجع الـ Entity كامل وجاهز للبزنس
     return new User(
+      //
       dto.username,
+
       dto.email,
       passwordHash, // بنمرر الهاش اللي اتعمل في الـ Use Case
       userProfile,

@@ -28,6 +28,7 @@ export class RegisterUser {
     const passwordHash = await this.hasher.hash(securePassword.getValue());
 
     const userEntity = RequestObjectToEntityConverter.toEntity(dto, passwordHash);
+    console.log(userEntity);
 
     await this.userRepository.save(userEntity);
 
