@@ -4,6 +4,7 @@ import { userRouter } from "./routes/userRoutes";
 import { globalErrorHandler } from "./modules/user/presentation/middlewares/ErrorHandler";
 import nutritionRouter from "./modules/nutrition/routes/nutritionRoutes";
 import { workoutRouter } from "./modules/workout/routes/workoutRoutes";
+import { connectDB } from "./shared/infrastructure/dataBase/mongo-db";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,14 @@ process.on("unhandledRejection", (err: Error) => {
   process.exit(1);
 });
 
-app.listen(PORT, () => {
-  console.log(`Serverrr running on http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  // 1. Connect to Cloud DB
+  await connectDB();
+
+  // 2. Start Express
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+};
+
+startServer();
