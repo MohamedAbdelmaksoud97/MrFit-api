@@ -10,6 +10,7 @@ export class MongoUserRepository implements IUserRepository {
       _id: user.getId(),
       email: user.getEmail(),
       passwordHash: user.getPassword(),
+      passwordUpdatedAt: user.getPasswordUpdatedAt(),
       isVerified: user.getVerificationStatus(),
       profile: user.getProfile(),
     };
@@ -69,6 +70,7 @@ export class MongoUserRepository implements IUserRepository {
       doc.passwordHash,
       profile,
       doc._id.toString(), // Convert MongoDB ObjectId to string for our Entity
+      doc.passwordUpdatedAt,
     );
 
     user.setVerified(doc.isVerified);

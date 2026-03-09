@@ -22,6 +22,7 @@ export class User {
   private email: string;
   private passwordHash: string;
   private isVerified: boolean = false; // حالة التحقق من الإيميل
+  private passwordUpdatedAt: Date;
   private profile: UserProfile; // استخدام الـ Composition هنا
 
   constructor(
@@ -30,11 +31,13 @@ export class User {
     passwordHash: string,
     profile: UserProfile,
     id?: string,
+    passwordUpdatedAt?: Date,
   ) {
     this.id = id || uuidv4();
     this.username = username;
     this.email = email;
     this.passwordHash = passwordHash;
+    this.passwordUpdatedAt = passwordUpdatedAt || new Date();
     this.profile = profile;
   }
 
@@ -62,6 +65,12 @@ export class User {
   }
   public setPassword(newPasswordHash: string) {
     this.passwordHash = newPasswordHash;
+  }
+  public getPasswordUpdatedAt() {
+    return this.passwordUpdatedAt;
+  }
+  public setPasswordUpdatedAt(date: Date) {
+    this.passwordUpdatedAt = date;
   }
 
   // Business Logic: تحديث بيانات الجسم

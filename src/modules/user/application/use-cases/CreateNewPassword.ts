@@ -43,6 +43,7 @@ export class CreateNewPassword {
     const newPasswordHash = await this.hasher.hash(securePassword.getValue());
 
     user.setPassword(newPasswordHash);
+    user.setPasswordUpdatedAt(new Date());
 
     await this.userRepository.save(user);
   }

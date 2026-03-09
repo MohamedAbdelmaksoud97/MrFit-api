@@ -27,6 +27,7 @@ export class RequestObjectToEntityConverter {
 
       dto.email,
       passwordHash, // بنمرر الهاش اللي اتعمل في الـ Use Case
+
       userProfile,
     );
   }

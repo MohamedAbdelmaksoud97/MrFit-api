@@ -20,6 +20,12 @@ export class Protect {
     // 2. التأكد إن صاحب التوكن لسه موجود في الداتابيز
     const user = await this.userRepository.findById(payload.sub);
 
+    const iat = payload.iat as number;
+    console.log(iat * 1000, user?.getPasswordUpdatedAt().getTime());
+    if (user && user.getPasswordUpdatedAt().getTime() > iat * 1000) {
+      throw new AppError("Token is invalid due to password change. Please log in again.", 401);
+    }
+
     console.log(user);
 
     if (!user) {

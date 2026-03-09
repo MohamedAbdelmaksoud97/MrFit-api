@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 
 const WorkoutPlanSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    _id: { type: String, required: true, unique: true },
+    userId: { type: String, ref: "User", required: true },
     fitnessLevelSnapshot: String,
     goalSnapshot: String,
     splitType: String,
@@ -20,6 +21,7 @@ const WorkoutPlanSchema = new mongoose.Schema(
             muscleGroup: String,
             sets: Number,
             reps: String,
+            isCompleted: Boolean,
             restSeconds: Number,
             notes: String,
           },
@@ -27,7 +29,7 @@ const WorkoutPlanSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true },
+  { timestamps: true, _id: false },
 );
 
 export const WorkoutModel = mongoose.model("WorkoutPlan", WorkoutPlanSchema);

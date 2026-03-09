@@ -24,7 +24,7 @@ const router = Router();
 // 1. Initialize Dependencies (Fakes)
 const fakeAi = new FakeAiGenerator();
 const geminiAi = new GeminiNutritionGenerator(process.env.GEMINI_API_KEY || "");
-const fakeRepo = new MongoNutritionRepository();
+const mongoRepo = new MongoNutritionRepository();
 
 const userRepo = new MongoUserRepository(); // Real or Fake
 
@@ -33,14 +33,14 @@ const protectUseCase = new Protect(tokenService, userRepo);
 const protectController = new ProtectController(protectUseCase);
 
 // 2. Initialize Use Case
-const generatePlanUseCase = new GenerateNutritionPlan(geminiAi, fakeRepo, userRepo);
+const generatePlanUseCase = new GenerateNutritionPlan(geminiAi, mongoRepo, userRepo);
 
 // 3. Initialize Controller
-const nutritionController = new NutritionController(generatePlanUseCase, fakeRepo);
-const getTheActivePlan = new GetTheActivePlan(fakeRepo, userRepo);
+const nutritionController = new NutritionController(generatePlanUseCase, mongoRepo);
+const getTheActivePlan = new GetTheActivePlan(mongoRepo, userRepo);
 const getActivePlanController = new GetActiveNutritionPlan(getTheActivePlan);
 
-const toggleMealUseCase = new ToggleMealStatus(fakeRepo);
+const toggleMealUseCase = new ToggleMealStatus(mongoRepo);
 const toggleMealController = new ToggleMealController(toggleMealUseCase);
 
 // 4. Define Routes
