@@ -28,6 +28,7 @@ import { UpdatePasswordController } from "../modules/user/controllers/UpdatePass
 import { ResendVerificationEmailController } from "../modules/user/controllers/ResendVerificationEmailController";
 import { ResendVerificationEmail } from "../modules/user/application/use-cases/ResendVerificationEmail";
 import { ProfileController } from "../modules/user/controllers/ProfileController";
+import { SendGridMailService } from "../modules/user/infrastructure/services/SendGridMailService";
 const userRouter = Router();
 
 // --- مرحلة تجميع الطبقات (The Assembly) ---
@@ -38,7 +39,7 @@ const userRepository = new MongoUserRepository();
 
 const hasher = new BcryptHasher();
 const tokenService = new JwtTokenEmailVerificationService();
-const emailSender = new FakeMailService();
+const emailSender = new SendGridMailService();
 // 2. البزنس لوجيك (Application) - بنحقن فيه الأدوات
 const registerUserUseCase = new RegisterUser(userRepository, hasher, tokenService, emailSender);
 
