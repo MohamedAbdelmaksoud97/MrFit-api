@@ -20,6 +20,11 @@ export interface ResponsingUser {
   profile: {
     age: number;
     goal: string;
+    height: number;
+    weight: number;
+    fitnessLevel: "Beginner" | "Intermediate" | "Advanced";
+    budgetLevel: "Economic" | "Average" | "High";
+
     bmi: number; // ممكن نحسبه واحنا بنرجع الداتا
   };
 }

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { AppError } from "../../../../shared/domain/errors/AppError";
 // 1. كلاس فرعي لبيانات الجسم (Value Object)
 export class UserProfile {
   constructor(
@@ -11,11 +12,41 @@ export class UserProfile {
     public readonly fatPercentage?: number,
     public readonly budgetLevel?: "Economic" | "Average" | "High",
   ) {
-    if (age < 15) throw new Error("التطبيق مخصص للأفراد فوق 15 سنة");
+    if (age < 15) {
+      throw new AppError("Application is only for individuals over 15 years old", 400);
+    }
+
+    if (weight <= 0) {
+      throw new AppError("Weight must be a positive number", 400);
+    }
+
+    if (height <= 0) {
+      throw new AppError("Height must be a positive number", 400);
+    }
+
+    if (fatPercentage !== undefined && (fatPercentage < 0 || fatPercentage > 100)) {
+      throw new AppError("Fat percentage must be between 0 and 100", 400);
+    }
+
+    const validFitnessLevels = ["Beginner", "Intermediate", "Advanced"];
+    if (!validFitnessLevels.includes(fitnessLevel)) {
+      throw new AppError(
+        `Invalid fitness level. Must be one of: ${validFitnessLevels.join(", ")}`,
+        400,
+      );
+    }
+
+    const validGoals = ["Losing Weight", "Building Muscle", "Maintenance"];
+    if (!validGoals.includes(goal)) {
+      throw new AppError(`Invalid goal. Must be one of: ${validGoals.join(", ")}`, 400);
+    }
+
+    if (budgetLevel && !["Economic", "Average", "High"].includes(budgetLevel)) {
+      throw new AppError("Invalid budget level provided", 400);
+    }
   }
 }
 
-// 2. كلاس اليوزر الأساسي
 export class User {
   private id: string;
   private username: string;
@@ -44,6 +75,9 @@ export class User {
   // Getters
   public getProfile() {
     return this.profile;
+  }
+  public setProfile(newProfile: UserProfile) {
+    this.profile = newProfile;
   }
   public getEmail() {
     return this.email;

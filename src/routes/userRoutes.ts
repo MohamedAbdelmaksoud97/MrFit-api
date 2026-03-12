@@ -29,6 +29,8 @@ import { ResendVerificationEmailController } from "../modules/user/controllers/R
 import { ResendVerificationEmail } from "../modules/user/application/use-cases/ResendVerificationEmail";
 import { ProfileController } from "../modules/user/controllers/ProfileController";
 import { SendGridMailService } from "../modules/user/infrastructure/services/SendGridMailService";
+import { UpdateProfileController } from "../modules/user/controllers/UpdateProfileController";
+import { UpdateProfile } from "../modules/user/application/use-cases/UpdateProfile";
 const userRouter = Router();
 
 // --- مرحلة تجميع الطبقات (The Assembly) ---
@@ -68,6 +70,9 @@ const resendVerificationEmailUseCase = new ResendVerificationEmail(
 const resendVerificationEmailController = new ResendVerificationEmailController(
   resendVerificationEmailUseCase,
 );
+const updateProfileUseCase = new UpdateProfile(userRepository);
+const updateProfile = new UpdateProfileController(updateProfileUseCase);
+// --- مرحلة تجميع الطبقات (The Assembly) ---
 // --- تعريف المسارات ---
 
 // تسجيل مستخدم جديد
@@ -106,5 +111,9 @@ userRouter.post("/update-password", protectController.execute, (req, res, next) 
 userRouter.post("/resend-verification-email", (req, res, next) =>
   resendVerificationEmailController.resendToken(req, res, next),
 );
-
+userRouter.patch(
+  "/update-profile",
+  (req, res, next) => protectController.execute(req, res, next),
+  (req, res, next) => updateProfile.excute(req, res, next),
+);
 export { userRouter };

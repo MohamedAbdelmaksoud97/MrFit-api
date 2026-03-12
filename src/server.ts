@@ -5,9 +5,19 @@ import { globalErrorHandler } from "./modules/user/presentation/middlewares/Erro
 import nutritionRouter from "./modules/nutrition/routes/nutritionRoutes";
 import { workoutRouter } from "./modules/workout/routes/workoutRoutes";
 import { connectDB } from "./shared/infrastructure/dataBase/mongo-db";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(
+  cors({
+    origin: ["http://localhost:8080", "http://localhost:8081"], // اسمح فقط لمشروع الـ Frontend بتاعك
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // مهم جداً لو بتبعت Cookies أو Tokens في الـ Header
+  }),
+);
 
 app.use(express.json());
 
