@@ -88,6 +88,7 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 
   next();
 });
+app.use(express.static(path.join(__dirname, "../dist")));
 
 app.use("/api/users", userRouter);
 app.use("/api/nutrition", nutritionRouter);
@@ -95,6 +96,9 @@ app.use("/api/workout", workoutRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({ status: "UP", timestamp: new Date().toISOString() });
+});
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
 app.use(globalErrorHandler);
