@@ -93,7 +93,6 @@ userRouter.get(
   (req, res, next) => profileController.getProfile(req, res, next),
 );
 
-// استعادة كلمة المرور
 userRouter.post("/forget-password", (req, res, next) =>
   forgetPasswordController.forgetPassword(req, res, next),
 );

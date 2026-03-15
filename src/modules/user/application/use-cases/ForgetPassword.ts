@@ -19,6 +19,6 @@ export class ForgetPassword {
 
     const resetToken = await this.tokenService.generateToken(user.getId());
 
-    await this.mailService.sendActivationEmail(email, resetToken);
+    await this.mailService.sendResetPasswordEmail(email, resetToken);
   }
 }
