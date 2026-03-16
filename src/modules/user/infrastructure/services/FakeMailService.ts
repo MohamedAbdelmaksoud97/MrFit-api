@@ -11,4 +11,7 @@ export class FakeMailService implements IMailService {
     console.log(`🔗 [Link]: ${link}`);
     console.log("-----------------------------------------");
   }
+  async sendResetPasswordEmail(email: string, token: string): Promise<void> {
+    console.log(`Fake email sent to ${email} with token ${token}`);
+  }
 }

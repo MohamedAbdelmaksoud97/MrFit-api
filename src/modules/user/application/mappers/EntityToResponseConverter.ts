@@ -14,7 +14,7 @@ export class EntityToResponseConverter {
         height: user.getProfile().height,
         weight: user.getProfile().weight,
         fitnessLevel: user.getProfile().fitnessLevel,
-        budgetLevel: user.getProfile().budgetLevel,
+        budgetLevel: user.getProfile().budgetLevel || "Average",
 
         // هنا الـ Mapper عمل "بزنس" بسيط: حسب الـ BMI للموبايل
         bmi: Number((user.getProfile().weight / (user.getProfile().height / 100) ** 2).toFixed(1)),

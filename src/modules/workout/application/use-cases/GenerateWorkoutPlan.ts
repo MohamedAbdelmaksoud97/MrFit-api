@@ -1,6 +1,6 @@
-import { IWorkoutRepository } from "../../domain/repositories/IWorkoutRepository";
+import { IWorkoutRepository } from "../../domain/interfaces/IWorkoutRrepository";
 import { IUserRepository } from "../../../user/domain/interfaces/IUserRepository";
-``;
+
 import { IWorkoutAiGenerator } from "../../domain/interfaces/IWorkoutAiGenerator";
 import { WorkoutPlan } from "../../domain/entities/WorkoutPlan";
 export class GenerateWorkoutPlan {

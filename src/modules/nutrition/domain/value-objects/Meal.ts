@@ -1,5 +1,5 @@
 import { Ingredient } from "./Ingredient";
-import { Macros } from "./macros";
+import { Macros } from "./Macros";
 export class Meal {
   constructor(
     public readonly name: string,

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-export const catchAsync = (fn) => {
+export const catchAsync = (fn: any) => {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res, next).catch(next); // أي خطأ يروح للـ Global Error Handler
   };

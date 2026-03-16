@@ -1,7 +1,7 @@
 // src/modules/nutrition/domain/entities/NutritionPlan.ts
 import { v4 as uuidv4 } from "uuid";
 import { Meal } from "../value-objects/Meal";
-import { Macros } from "../value-objects/macros";
+import { Macros } from "../value-objects/Macros";
 
 export class NutritionPlan {
   private id: string;
