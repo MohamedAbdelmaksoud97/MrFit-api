@@ -1,0 +1,36 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.workoutRouter = void 0;
+const express_1 = require("express");
+const workoutController_1 = require("../controllers/workoutController");
+const GenerateWorkoutPlan_1 = require("../../workout/application/use-cases/GenerateWorkoutPlan");
+const FakeWorkoutAiGenerator_1 = require("../infrastructures/services/FakeWorkoutAiGenerator");
+const GeminaiWorkoutGenerator_1 = require("../infrastructures/services/GeminaiWorkoutGenerator");
+const GetActiveWorkoutPlan_1 = require("../application/use-cases/GetActiveWorkoutPlan");
+const Protect_1 = require("../../user/application/use-cases/Protect");
+const ProtectController_1 = require("../../user/controllers/ProtectController");
+const JWTService_1 = require("../../user/infrastructure/services/JWTService");
+const IMongooseRepository_1 = require("../../user/infrastructure/repositories/IMongooseRepository");
+const MongoWorkoutRepository_1 = require("../infrastructures/repositories/MongoWorkoutRepository");
+const GetActiveWorkoutController_1 = require("../controllers/GetActiveWorkoutController");
+const ToggleWorkoutStatus_1 = require("../application/use-cases/ToggleWorkoutStatus");
+const ToggleWorkoutStatusController_1 = require("../controllers/ToggleWorkoutStatusController");
+const workoutRouter = (0, express_1.Router)();
+exports.workoutRouter = workoutRouter;
+const mongoUserRepo = new IMongooseRepository_1.MongoUserRepository();
+const protectUseCase = new Protect_1.Protect(new JWTService_1.JwtTokenEmailVerificationService(), mongoUserRepo);
+const protectController = new ProtectController_1.ProtectController(protectUseCase);
+// src/modules/workout/infrastructure/routes/workoutRoutes.ts
+// الحقن (Dependency Injection) بنفس فكرة الـ Shared Instances
+const workoutAi = new FakeWorkoutAiGenerator_1.FakeWorkoutAiGenerator();
+const workoutRepo = new MongoWorkoutRepository_1.MongoWorkoutRepository();
+const geminiWorkoutAi = new GeminaiWorkoutGenerator_1.GeminiWorkoutGenerator(process.env.GEMINI_API_KEY || "");
+const generateWorkout = new GenerateWorkoutPlan_1.GenerateWorkoutPlan(workoutRepo, mongoUserRepo, geminiWorkoutAi);
+const getActiveWorkoutUseCase = new GetActiveWorkoutPlan_1.GetActiveWorkoutPlan(workoutRepo);
+const getActiveWorkoutController = new GetActiveWorkoutController_1.GetActiveWorkoutController(getActiveWorkoutUseCase);
+const workoutController = new workoutController_1.WorkoutController(generateWorkout, workoutRepo);
+const toggleWorkoutStatusUseCase = new ToggleWorkoutStatus_1.ToggleWorkoutStatus(workoutRepo);
+const toggleWorkoutStatusController = new ToggleWorkoutStatusController_1.ToggleWorkoutStatusController(toggleWorkoutStatusUseCase);
+workoutRouter.post("/generate", (req, res, next) => protectController.execute(req, res, next), workoutController.generate);
+workoutRouter.get("/active", (req, res, next) => protectController.execute(req, res, next), (req, res, next) => getActiveWorkoutController.execute(req, res, next));
+workoutRouter.patch("/toggle-exercise", (req, res, next) => protectController.execute(req, res, next), (req, res, next) => toggleWorkoutStatusController.toggleExercise(req, res, next));
