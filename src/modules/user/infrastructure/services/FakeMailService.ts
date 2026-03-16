@@ -7,7 +7,7 @@ export class FakeMailService implements IMailService {
 
   async sendActivationEmail(email: string, link: string): Promise<void> {
     console.log("-----------------------------------------");
-    console.log(`📧 [FakeMail]: Sending Activation to ${email}`);
+    console.log(`📧 [FakeMail]:: Sending Activation to ${email}`);
     console.log(`🔗 [Link]: ${link}`);
     console.log("-----------------------------------------");
   }
