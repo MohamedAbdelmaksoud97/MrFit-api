@@ -17,11 +17,23 @@ import { connectDB } from "./shared/infrastructure/dataBase/mongo-db";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 1. Security & Trust Proxy
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
 
-app.use(helmet());
+// 2. Helmet with CSP for Production
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "connect-src": ["'self'", "https://api.mrfit-app.com", "http://localhost:3000"],
+      },
+    },
+  }),
+);
 
+// 3. CORS Configuration
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN
@@ -34,6 +46,7 @@ app.use(
   }),
 );
 
+// 4. Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -43,11 +56,18 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
+// 5. Body Parsers & Static Files
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 app.use(compression());
 
+// --- Define Frontend Path ---
+// استخدام process.cwd() يضمن الوصول لمجلد dist في الـ Root دائماً
+const FRONTEND_BUILD_PATH = path.resolve(process.cwd(), "dist");
+app.use(express.static(FRONTEND_BUILD_PATH));
+
+// 6. Data Sanitization (NoSQL injection & XSS)
 function stripNoSQLOps(obj: any): void {
   if (!obj || typeof obj !== "object") return;
   if (Array.isArray(obj)) {
@@ -65,7 +85,6 @@ function stripNoSQLOps(obj: any): void {
 
 function mutateSanitize(obj: any): void {
   if (!obj || typeof obj !== "object") return;
-
   for (const key of Object.keys(obj)) {
     const val = obj[key];
     if (typeof val === "string") {
@@ -78,18 +97,16 @@ function mutateSanitize(obj: any): void {
 
 app.use((req: Request, _res: Response, next: NextFunction) => {
   const targets = [req.body, req.query, req.params];
-
   targets.forEach((target) => {
     if (target) {
       stripNoSQLOps(target);
       mutateSanitize(target);
     }
   });
-
   next();
 });
-app.use(express.static(path.join(__dirname, "../dist")));
 
+// 7. API Routes
 app.use("/api/users", userRouter);
 app.use("/api/nutrition", nutritionRouter);
 app.use("/api/workout", workoutRouter);
@@ -97,12 +114,21 @@ app.use("/api/workout", workoutRouter);
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({ status: "UP", timestamp: new Date().toISOString() });
 });
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/index.html"));
+
+// 8. Frontend Catch-all (Must be AFTER API routes)
+app.get(/^(?!\/api).*/, (req: Request, res: Response) => {
+  res.sendFile(path.join(FRONTEND_BUILD_PATH, "index.html"), (err) => {
+    if (err) {
+      console.error("❌ Error sending index.html:", err);
+      res.status(404).send("Frontend build not found.");
+    }
+  });
 });
 
+// 9. Global Error Handler
 app.use(globalErrorHandler);
 
+// 10. Start Server
 const startServer = async () => {
   try {
     await connectDB();
@@ -112,11 +138,13 @@ const startServer = async () => {
       console.log(`🚀 MrFit Server running on http://localhost:${PORT}`);
     });
 
+    // Error Handling for Uncaught Rejections
     process.on("unhandledRejection", (err: Error) => {
       console.error("UNHANDLED REJECTION! 💥 Shutting down...");
       console.error(err.name, err.message);
       server.close(() => process.exit(1));
     });
+
     process.on("uncaughtException", (err: Error) => {
       console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");
       console.error(err.name, err.message);
