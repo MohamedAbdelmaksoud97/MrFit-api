@@ -71,6 +71,5 @@ Rate Limiting: Protecting against brute-force attacks.
 👤 Author
 Mohamed Abdelmaksoud
 LinkedIn: [https://www.linkedin.com/in/mohamed-abdelmaksoud-045222352/]
-Portfolio: [https://mohamedabdelmaksoud.site/]
 
-Portfolio: [Your Portfolio Link]
+Portfolio: [https://mohamedabdelmaksoud.site/]
