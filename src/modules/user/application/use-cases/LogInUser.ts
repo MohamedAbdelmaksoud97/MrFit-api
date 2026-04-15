@@ -21,11 +21,11 @@ export class LogInUser {
     if (!isPasswordValid) {
       throw new AppError("Invalid email or password", 401);
     }
-
+    /*
     if (!user.getVerificationStatus()) {
       throw new AppError("Please activate your account first. Check your email.", 403);
     }
-
+*/
     const token = await this.tokenService.generateToken(user.getId());
 
     return token;

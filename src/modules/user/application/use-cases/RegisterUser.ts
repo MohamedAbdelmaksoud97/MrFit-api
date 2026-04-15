@@ -34,7 +34,7 @@ export class RegisterUser {
 
     const token = await this.tokenService.generateToken(userEntity.getId());
 
-    await this.emailSender.sendActivationEmail(userEntity.getEmail(), token);
+    //await this.emailSender.sendActivationEmail(userEntity.getEmail(), token);
 
     return EntityToResponseConverter.toDTO(userEntity);
   }
